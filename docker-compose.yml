@@ -1,0 +1,19 @@
+version: "3.7"
+
+services:
+  db:
+    image: mongo:4.2
+    container_name: database-postgrain-test
+    restart: always
+    ports:
+      - 27017:27017
+  api:
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 3001:3001
+    env_file: .compose.env
+    container_name: college-system-api
+    depends_on: 
+      - db
