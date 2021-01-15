@@ -5,7 +5,9 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import swaggerUi from 'swagger-ui-express';
 
+import swaggerDocument from '@docs/swaggerDocument';
 import database from './database';
 
 database();
@@ -16,6 +18,7 @@ app.use(cors());
 app.use(helmet());
 app.use(express.json());
 app.use(morgan('dev'));
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get('/', (req, res) => res.json('Pegou'));
 

@@ -22,9 +22,10 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
+      "@config/*": ["./src/config/*"],
       "@controllers/*": ["./src/controllers/*"],
-      "@models/*": ["./src/models/*"],
-      "@config/*": ["./src/config/*"]
+      "@docs/*": ["./src/docs/*"],
+      "@models/*": ["./src/models/*"]
     }
   },
   "include": [
