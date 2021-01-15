@@ -7,7 +7,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
 
-import swaggerDocument from '@docs/swaggerDocument';
+import swaggerDocument from '@src/docs';
 import database from './database';
 
 database();
