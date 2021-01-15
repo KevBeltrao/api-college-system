@@ -24,8 +24,12 @@
     "paths": {
       "@config/*": ["./src/config/*"],
       "@controllers/*": ["./src/controllers/*"],
-      "@docs/*": ["./src/docs/*"],
-      "@models/*": ["./src/models/*"]
+      "@helpers/*": ["./src/helpers/*"],
+      "@models/*": ["./src/models/*"],
+      "@repositories/*": ["./src/repositories/*"],
+      "@src/*": ["./src/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@validators/*": ["./src/validators"]
     }
   },
   "include": [
