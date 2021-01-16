@@ -8,6 +8,11 @@ import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
 
 import swaggerDocument from '@src/docs';
+import routes from '@src/routes';
+
+import errorHandler from '@helpers/errorHandler';
+import responseHandler from '@helpers/responseHandler';
+
 import database from './database';
 
 database();
@@ -20,6 +25,8 @@ app.use(express.json());
 app.use(morgan('dev'));
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.get('/', (req, res) => res.json('Pegou'));
+app.use(routes);
+app.use(errorHandler);
+app.use(responseHandler);
 
 export default app;

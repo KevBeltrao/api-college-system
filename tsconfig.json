@@ -28,6 +28,7 @@
       "@models/*": ["./src/models/*"],
       "@repositories/*": ["./src/repositories/*"],
       "@src/*": ["./src/*"],
+      "@customTypes/*": ["src/customTypes/*"],
       "@utils/*": ["./src/utils/*"],
       "@validators/*": ["./src/validators"]
     }

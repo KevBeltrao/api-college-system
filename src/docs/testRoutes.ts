@@ -30,7 +30,7 @@ export default {
           schema: {
             type: 'object',
             properties: {
-              message: {
+              data: {
                 type: 'string',
                 example: 'Pegou',
               },
