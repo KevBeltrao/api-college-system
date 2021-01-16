@@ -22,7 +22,6 @@ const UserDiscipline = new Schema({
   status: {
     type: String,
     enum: ['aprovado', 'reprovado', 'em andamento'],
-    required: true,
     default: 'em andamento',
   },
   finalScore: Number,

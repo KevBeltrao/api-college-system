@@ -8,7 +8,8 @@
     "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only --ignore-watch node_modules src/server.ts",
     "lint": "eslint src/** --fix",
     "start": "node dist/server.js",
-    "test": "jest"
+    "test": "jest --runInBand",
+    "watch": "jest --watchAll --runInBand"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -17,10 +18,11 @@
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
     "helmet": "^4.3.1",
-    "mongoose": "^5.11.11",
+    "mongoose": "^5.11.12",
     "morgan": "^1.10.0",
     "swagger-ui-express": "^4.1.6",
     "ts-jest": "^26.4.4",
+    "uuid": "^8.3.2",
     "yup": "^0.32.8"
   },
   "devDependencies": {
@@ -32,6 +34,7 @@
     "@types/morgan": "^1.9.2",
     "@types/supertest": "^2.0.10",
     "@types/swagger-ui-express": "^4.1.2",
+    "@types/uuid": "^8.3.0",
     "@types/yup": "^0.29.11",
     "@typescript-eslint/eslint-plugin": "^4.13.0",
     "@typescript-eslint/parser": "^4.13.0",

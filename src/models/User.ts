@@ -30,14 +30,12 @@ const UserSchema = new Schema({
     select: false,
   },
   active: {
-    required: true,
     type: Boolean,
     default: false,
   },
   role: {
     type: String,
     enum: ['admin', 'student'],
-    required: true,
     default: 'student',
   },
   cpf: {

@@ -16,26 +16,23 @@ export const password = yup
   .min(6, 'Password is too short')
   .required('Password field is required');
 
-export const role = yup
-  .string()
-  .oneOf(['admin', 'student'], 'Invalid role')
-  .required('Role field is required');
-
 export const cpf = yup
   .string()
   .matches(cpfRegex);
 
-export const semester = yup
+export const firstSemester = yup
   .object({
     year: yup
       .number()
       .min(1900)
-      .max(2999),
+      .max(2999)
+      .required(),
     unity: yup
       .number()
       .min(1)
-      .max(2),
-  });
+      .max(2)
+      .required(),
+  }).required();
 
 export const registration = yup
   .string()

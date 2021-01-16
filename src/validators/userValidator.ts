@@ -4,9 +4,8 @@ import {
   name,
   email,
   password,
-  role,
   cpf,
-  semester,
+  firstSemester,
   registration,
 } from './utils/formats';
 
@@ -14,8 +13,7 @@ const userSchemaCreate = yup.object().shape({
   email,
   password,
   name,
-  role,
-  semester,
+  firstSemester,
   registration,
 });
 
