@@ -1,13 +1,9 @@
-import {
-  Router, Request, Response, NextFunction,
-} from 'express';
+import { Router } from 'express';
+
+import userRoutes from './userRoutes';
 
 const router = Router();
 
-router.get('/', (req: Request, res: Response, next: NextFunction): void => {
-  res.locals.data = 'Pegou';
-
-  return next();
-});
+router.use('/users', userRoutes);
 
 export default router;
