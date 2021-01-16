@@ -6,6 +6,7 @@ const router = Router();
 
 router.get('/', (req: Request, res: Response, next: NextFunction): void => {
   res.locals.data = 'Pegou';
+
   return next();
 });
 
