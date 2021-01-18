@@ -1,5 +1,8 @@
 import * as yup from 'yup';
 import { isValid as isCPFValid } from 'cpf';
+import { ObjectID } from 'mongodb';
+
+import statusEnum from '@models/utils/statusEnum';
 
 export const name = yup
   .string()
@@ -66,3 +69,20 @@ export const schedule = yup
       .max(6)
       .required(),
   }));
+
+export const objectId = yup
+  .string()
+  .test('test object id', 'Invalid object id', (objectIdString: string = ''): boolean => (
+    ObjectID.isValid(objectIdString)
+  ));
+
+export const status = yup
+  .string()
+  .oneOf(statusEnum)
+  .required();
+
+export const finalScore = yup
+  .number()
+  .min(0)
+  .max(10)
+  .nullable();
