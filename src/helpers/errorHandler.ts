@@ -8,7 +8,11 @@ export default (
   res: Response,
   next: NextFunction,
 ): void => {
-  if (process.env.NODE_ENV === 'development' || error.constructor.name === 'object') {
+  if (
+    process.env.NODE_ENV === 'development'
+    || process.env.NODE_ENV === 'test'
+    || error.constructor.name === 'object'
+  ) {
     res.locals = {
       data: error.message,
       status: res.locals.status || 400,

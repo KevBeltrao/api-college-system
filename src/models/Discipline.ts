@@ -3,6 +3,7 @@ import { Schema, model, Document } from 'mongoose';
 import ScheduleSubschema, { IScheduleSubschema } from './utils/ScheduleSubschema';
 
 interface IDiscipline extends Document {
+  name: string;
   professor: string;
   dificulty: number;
   schedule: Array<IScheduleSubschema>;
@@ -13,22 +14,17 @@ const Discipline = new Schema({
     type: String,
     required: true,
   },
-  email: {
+  professor: {
     type: String,
     required: true,
-    unique: true,
   },
-  password: {
-    type: String,
+  dificulty: {
+    type: Number,
     required: true,
-    select: false,
+    min: 1,
+    max: 5,
   },
   schedule: [ScheduleSubschema],
-  active: {
-    required: true,
-    type: Boolean,
-    default: false,
-  },
 }, {
   timestamps: true,
 });

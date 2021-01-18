@@ -1,12 +1,13 @@
 import { Schema, model, Document } from 'mongoose';
 
+import SemesterSubschema, { ISemesterSubschema } from './utils/SemesterSubschema';
+
 interface IUserDiscipline extends Document {
   userId: string;
   disciplineId: string;
   status: string;
   finalScore: number;
-  year: Number;
-  semester: Number;
+  semester: ISemesterSubschema;
 }
 
 const UserDiscipline = new Schema({
@@ -21,18 +22,10 @@ const UserDiscipline = new Schema({
   status: {
     type: String,
     enum: ['aprovado', 'reprovado', 'em andamento'],
-    required: true,
     default: 'em andamento',
   },
   finalScore: Number,
-  year: {
-    type: Number,
-    required: true,
-  },
-  semester: {
-    type: Number,
-    required: true,
-  },
+  semester: SemesterSubschema,
 }, {
   timestamps: true,
 });
