@@ -2,10 +2,10 @@ import { Schema, model, Document } from 'mongoose';
 
 import ScheduleSubschema, { IScheduleSubschema } from './utils/ScheduleSubschema';
 
-interface IDiscipline extends Document {
+export interface IDiscipline extends Document {
   name: string;
   professor: string;
-  dificulty: number;
+  difficulty: number;
   schedule: Array<IScheduleSubschema>;
 }
 
@@ -18,7 +18,7 @@ const Discipline = new Schema({
     type: String,
     required: true,
   },
-  dificulty: {
+  difficulty: {
     type: Number,
     required: true,
     min: 1,

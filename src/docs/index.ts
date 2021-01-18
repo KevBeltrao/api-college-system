@@ -1,4 +1,5 @@
 import userDocs from './userDocs';
+import disciplineDocs from './disciplineDocs';
 
 export default {
   swagger: '2.0',
@@ -13,6 +14,7 @@ export default {
   ],
   paths: {
     ...userDocs,
+    ...disciplineDocs,
   },
   securityDefinitions: {
     token: {

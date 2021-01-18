@@ -36,6 +36,10 @@ const { name, email, cpf } = createUserSchema;
 export const updateUserSchema = { name, email, cpf };
 
 export const userResponseSchema = {
+  _id: {
+    type: 'string',
+    example: '6005df7a9ec2713f2c1cd41a',
+  },
   ...createUserSchema,
   registration: {
     type: 'string',
