@@ -146,7 +146,7 @@ describe('Test userDisciplines\' controllers', () => {
     expect(typeof data).toBe('object');
     expect(data.userId.toString()).toBe(newUserDisciplineInfo.userId.toString());
     expect(data.disciplineId.toString()).toBe(newUserDisciplineInfo.disciplineId.toString());
-    expect(data.finalScore).toBe(newUserDisciplineInfo.finalScore);
+    expect(data.finalScore).toBe(newInfo.finalScore);
     expect(typeof data.semester).toBe('object');
     expect(data.semester.year).toBe(newUserDisciplineInfo.semester.year);
     expect(data.semester.unity).toBe(newUserDisciplineInfo.semester.unity);
