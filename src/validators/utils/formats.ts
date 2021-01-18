@@ -1,6 +1,5 @@
 import * as yup from 'yup';
-
-import cpfRegex from './cpfRegex';
+import { isValid as isCPFValid } from 'cpf';
 
 export const name = yup
   .string()
@@ -18,7 +17,9 @@ export const password = yup
 
 export const cpf = yup
   .string()
-  .matches(cpfRegex);
+  .test('test cpf', 'Invalid cpf', (CPFValue: string = ''): boolean => (
+    isCPFValid(CPFValue)
+  ));
 
 export const firstSemester = yup
   .object({
@@ -37,3 +38,6 @@ export const firstSemester = yup
 export const registration = yup
   .string()
   .required();
+
+export const course = yup
+  .string();

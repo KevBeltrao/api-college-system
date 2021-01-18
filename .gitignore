@@ -1,4 +1,7 @@
 node_modules
+coverage
 dist
 .env
 .compose.env
+combined.log
+error.log

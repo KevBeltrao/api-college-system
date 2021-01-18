@@ -3,7 +3,7 @@ import { hash } from 'bcryptjs';
 
 import SemesterSubschema, { ISemesterSubschema } from './utils/SemesterSubschema';
 
-interface IUserSchema extends Document {
+export interface IUserSchema extends Document {
   name: string;
   email: string;
   password: string;
@@ -12,6 +12,7 @@ interface IUserSchema extends Document {
   cpf: string;
   firstSemester: ISemesterSubschema;
   registration: string;
+  course: string;
 }
 
 const UserSchema = new Schema({
@@ -49,6 +50,10 @@ const UserSchema = new Schema({
     unique: true,
   },
   firstSemester: SemesterSubschema,
+  course: {
+    type: String,
+    required: true,
+  },
 }, {
   timestamps: true,
 });

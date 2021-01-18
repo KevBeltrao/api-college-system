@@ -36,6 +36,16 @@
             }
         ],
         "import/prefer-default-export": "off",
-        "linebreak-style": "off"
+        "linebreak-style": "off",
+        "no-underscore-dangle": [
+            "error",
+            {
+              "allow": [
+                "_id",
+                "_doc",
+                "_update"
+              ]
+            }
+          ]
     }
 }

@@ -1,14 +1,16 @@
 import mongoose from 'mongoose';
 
+import logger from './logger';
+
 export default () => {
   mongoose.connect(process.env.MONGO_URI || '', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
+    useFindAndModify: false,
   });
 
   mongoose.connection.once('open', () => {
-    // eslint-disable-next-line no-console
-    console.log('Connected to database');
+    logger.log('info', 'Database connected');
   });
 };

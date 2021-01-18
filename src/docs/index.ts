@@ -1,4 +1,4 @@
-import testRoutes from './testRoutes';
+import userDocs from './userDocs';
 
 export default {
   swagger: '2.0',
@@ -12,7 +12,7 @@ export default {
     'https',
   ],
   paths: {
-    ...testRoutes,
+    ...userDocs,
   },
   securityDefinitions: {
     token: {

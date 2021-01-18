@@ -7,6 +7,7 @@ import {
   cpf,
   firstSemester,
   registration,
+  course,
 } from './utils/formats';
 
 const userSchemaCreate = yup.object().shape({
@@ -15,6 +16,7 @@ const userSchemaCreate = yup.object().shape({
   name,
   firstSemester,
   registration,
+  course,
 });
 
 const userSchemaUpdate = yup.object().shape({
@@ -25,15 +27,5 @@ const userSchemaUpdate = yup.object().shape({
 
 export default {
   checkCreate: (body: object) => userSchemaCreate.validateSync(body),
-  checkUpdate: (body: any) => {
-    if (body.email) {
-      throw new Error('Email cannot be changed');
-    }
-
-    if (body.password) {
-      throw new Error('Password reset has it\'s own endpoint');
-    }
-
-    return userSchemaUpdate.validateSync(body);
-  },
+  checkUpdate: (body: object) => userSchemaUpdate.validateSync(body),
 };
