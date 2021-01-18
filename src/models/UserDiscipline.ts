@@ -1,8 +1,9 @@
 import { Schema, model, Document } from 'mongoose';
+import { statusEnum } from './utils/statusEnum';
 
 import SemesterSubschema, { ISemesterSubschema } from './utils/SemesterSubschema';
 
-interface IUserDiscipline extends Document {
+export interface IUserDiscipline extends Document {
   userId: string;
   disciplineId: string;
   status: string;
@@ -21,7 +22,7 @@ const UserDiscipline = new Schema({
   },
   status: {
     type: String,
-    enum: ['aprovado', 'reprovado', 'em andamento'],
+    enum: statusEnum,
     default: 'em andamento',
   },
   finalScore: Number,
