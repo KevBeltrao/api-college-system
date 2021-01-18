@@ -5,7 +5,7 @@ import logger from './logger';
 export default () => {
   mongoose.connect(process.env.MONGO_URI || '', {
     useNewUrlParser: true,
-    useUnifiedTopology: true,
+    useUnifiedTopology: false,
     useCreateIndex: true,
     useFindAndModify: false,
   });

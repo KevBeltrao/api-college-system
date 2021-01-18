@@ -41,3 +41,28 @@ export const registration = yup
 
 export const course = yup
   .string();
+
+export const difficulty = yup
+  .number()
+  .min(1)
+  .max(5)
+  .required();
+
+export const schedule = yup
+  .array().of(yup.object().shape({
+    startHourInMinutes: yup
+      .number()
+      .min(0)
+      .max(24 * 60 - 1)
+      .required(),
+    endHourInMinutes: yup
+      .number()
+      .min(0)
+      .max(24 * 60 - 1)
+      .required(),
+    day: yup
+      .number()
+      .min(0)
+      .max(6)
+      .required(),
+  }));
