@@ -7,7 +7,7 @@ import {
   listUsers,
   detailUser,
   deleteUser,
-} from '@repositories/userRepositories';
+} from '@repositories/userRepository';
 
 export default {
   list: async (req: Request, res: Response, next: NextFunction): Promise<void> => {

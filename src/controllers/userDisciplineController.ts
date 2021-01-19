@@ -7,7 +7,7 @@ import {
   listUserDisciplines,
   detailUserDiscipline,
   deleteUserDiscipline,
-} from '@repositories/userDisciplineRepositories';
+} from '@repositories/userDisciplineRepository';
 
 export default {
   list: async (req: Request, res: Response, next: NextFunction): Promise<void> => {

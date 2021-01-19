@@ -6,7 +6,7 @@ import SemesterSubschema, { ISemesterSubschema } from './utils/SemesterSubschema
 export interface IUserSchema extends Document {
   name: string;
   email: string;
-  password: string;
+  password?: string;
   active: boolean;
   role: string;
   cpf: string;
