@@ -1,6 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 
 import generateRegistration from '@utils/generateRegistration';
+import generateToken from '@utils/generateToken';
+
+import sendEmail from '@utils/sendEmail';
+import confirmEmailTemplate from '@templates/confirmEmailTemplate';
+
 import userValidator from '@validators/userValidator';
 import {
   createUser,
@@ -40,6 +45,14 @@ export default {
     userValidator.checkCreate(newUserInfo);
 
     const newUser = await createUser(newUserInfo);
+
+    const token = generateToken({ id: newUser._id });
+    const clientURL = process.env.CLIENT_URL;
+    await sendEmail({
+      to: email,
+      subject: 'Confirmação de email - College System',
+      html: confirmEmailTemplate(`${clientURL}/confirmar-email/${token}`),
+    });
 
     res.locals.data = newUser;
     res.locals.status = 201;
