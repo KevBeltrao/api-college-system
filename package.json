@@ -8,6 +8,7 @@
     "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only --ignore-watch node_modules src/server.ts",
     "lint": "eslint src/** --fix",
     "start": "node dist/server.js",
+    "superuser": "node dist/scripts/createSuperUser",
     "test": "jest --runInBand --coverage --testTimeout=10000",
     "watch": "jest --watchAll --runInBand --testTimeout=10000"
   },
@@ -25,6 +26,7 @@
     "mongodb": "^3.6.3",
     "mongoose": "^5.11.12",
     "morgan": "^1.10.0",
+    "readline-sync": "^1.4.10",
     "swagger-ui-express": "^4.1.6",
     "ts-jest": "^26.4.4",
     "uuid": "^8.3.2",
@@ -40,6 +42,7 @@
     "@types/jsonwebtoken": "^8.5.0",
     "@types/mongoose": "^5.10.3",
     "@types/morgan": "^1.9.2",
+    "@types/readline-sync": "^1.4.3",
     "@types/supertest": "^2.0.10",
     "@types/swagger-ui-express": "^4.1.2",
     "@types/uuid": "^8.3.0",

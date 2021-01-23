@@ -25,7 +25,16 @@ const userSchemaUpdate = yup.object().shape({
   cpf,
 });
 
+const superUserSchemaCreate = yup.object().shape({
+  email,
+  password,
+  name,
+  registration,
+  course,
+});
+
 export default {
   checkCreate: (body: object) => userSchemaCreate.validateSync(body),
   checkUpdate: (body: object) => userSchemaUpdate.validateSync(body),
+  checkSuperCreate: (body: object) => superUserSchemaCreate.validateSync(body),
 };
