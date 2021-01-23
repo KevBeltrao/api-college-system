@@ -6,13 +6,11 @@ import authenticationHandler from '@helpers/authenticationHandler';
 const router = Router();
 
 router.route('/')
-  .all(authenticationHandler)
-  .get(disciplineController.list)
-  .post(disciplineController.create);
+  .get(authenticationHandler({ shouldBeAdmin: false }), disciplineController.list)
+  .post(authenticationHandler({ shouldBeAdmin: true }), disciplineController.create);
 router.route('/:id')
-  .all(authenticationHandler)
-  .get(disciplineController.detail)
-  .patch(disciplineController.update)
-  .delete(disciplineController.delete);
+  .get(authenticationHandler({ shouldBeAdmin: false }), disciplineController.detail)
+  .patch(authenticationHandler({ shouldBeAdmin: true }), disciplineController.update)
+  .delete(authenticationHandler({ shouldBeAdmin: true }), disciplineController.delete);
 
 export default router;

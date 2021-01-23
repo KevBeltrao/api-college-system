@@ -1,9 +1,14 @@
 import supertest from 'supertest';
 import faker from 'faker';
+import { generate as generateCPF } from 'cpf';
 
 import app from '../../src/config/app';
+
 import Discipline from '../../src/models/Discipline';
+import User from '../../src/models/User';
+
 import generateRandomNumber from '../../src/utils/generateRandomNumber';
+import generateRegistration from '../../src/utils/generateRegistration';
 
 const request = supertest(app);
 
@@ -25,9 +30,56 @@ const generateDiscipline = () => ({
   ],
 });
 
+const generateUser = (isSuperUser: Boolean = false) => ({
+  name: faker.name.findName(),
+  email: faker.internet.email(),
+  password: '123123',
+  cpf: generateCPF(false),
+  year: 2019,
+  unity: 1,
+  course: 'Sistemas de informação',
+  role: isSuperUser ? 'admin' : 'student',
+});
+
+const loginAsSuperUser = async (email: string, password: string) => {
+  const { body } = await request
+    .post('/login')
+    .send({ login: email, password });
+
+  return body.data.token;
+};
+
 describe('Test disciplines\' controllers', () => {
+  type SuperUserType = {
+    _id: string;
+    email: string;
+    token: string;
+  }
+  const superUserInfo = {} as SuperUserType;
+
+  beforeAll(async () => {
+    const newSuperUserInfo = {
+      ...generateUser(true),
+      registration: generateRegistration(),
+    };
+
+    const superUser = await User.create(newSuperUserInfo);
+
+    const { _id, email } = superUser;
+
+    const token = await loginAsSuperUser(email, newSuperUserInfo.password);
+
+    superUserInfo.email = email;
+    superUserInfo._id = _id;
+    superUserInfo.token = token;
+  });
+
+  afterAll(async () => User.findByIdAndDelete(superUserInfo._id));
+
   test('Should list disciplines', async () => {
-    const { body, status } = await request.get('/disciplines');
+    const { body, status } = await request
+      .get('/disciplines')
+      .set('authorization', `Bearer ${superUserInfo.token}`);
 
     const { data } = body;
 
@@ -40,23 +92,31 @@ describe('Test disciplines\' controllers', () => {
     expect(typeof firstDiscipline.difficulty).toBe('number');
     expect(typeof firstDiscipline.schedule).toBe('object');
   });
+
   test('Should NOT create a discipline', async () => {
     const newDisciplineInfo = generateDiscipline();
     newDisciplineInfo.schedule[0].startHourInMinutes = (
       newDisciplineInfo.schedule[0].endHourInMinutes + 1
     );
 
-    const { body, status } = await request.post('/disciplines').send(newDisciplineInfo);
+    const { body, status } = await request
+      .post('/disciplines')
+      .send(newDisciplineInfo)
+      .set('authorization', `Bearer ${superUserInfo.token}`);
 
     const { data } = body;
 
     expect(typeof data).toBe('string');
     expect(status).toBe(400);
   });
+
   test('Should create a discipline', async () => {
     const newDisciplineInfo = generateDiscipline();
 
-    const { body, status } = await request.post('/disciplines').send(newDisciplineInfo);
+    const { body, status } = await request
+      .post('/disciplines')
+      .send(newDisciplineInfo)
+      .set('authorization', `Bearer ${superUserInfo.token}`);
 
     const { data } = body;
 
@@ -87,7 +147,9 @@ describe('Test disciplines\' controllers', () => {
 
     const newDiscipline = await Discipline.create(newDisciplineInfo);
 
-    const { body, status } = await request.get(`/disciplines/${newDiscipline._id}`);
+    const { body, status } = await request
+      .get(`/disciplines/${newDiscipline._id}`)
+      .set('authorization', `Bearer ${superUserInfo.token}`);
 
     const { data } = body;
 
@@ -114,7 +176,9 @@ describe('Test disciplines\' controllers', () => {
     );
   });
   test('Should NOT detail a discipline (wrong id)', async () => {
-    const { body, status } = await request.get('/disciplines/600566dca73e1f2b2cd112f3');
+    const { body, status } = await request
+      .get('/disciplines/600566dca73e1f2b2cd112f3')
+      .set('authorization', `Bearer ${superUserInfo.token}`);
 
     const { data } = body;
 
@@ -130,7 +194,11 @@ describe('Test disciplines\' controllers', () => {
 
     const newInfo = generateDiscipline();
 
-    const { body, status } = await request.patch(`/disciplines/${newDiscipline._id}`).send(newInfo);
+    const { body, status } = await request
+      .patch(`/disciplines/${newDiscipline._id}`)
+      .send(newInfo)
+      .set('authorization', `Bearer ${superUserInfo.token}`);
+
     await Discipline.findByIdAndDelete(newDiscipline._id);
 
     const { data } = body;
@@ -157,7 +225,9 @@ describe('Test disciplines\' controllers', () => {
     );
   });
   test('It should NOT update an discipline (wrong id)', async () => {
-    const { body, status } = await request.patch('/disciplines/600566dca73e1f2b2cd112f3');
+    const { body, status } = await request
+      .patch('/disciplines/600566dca73e1f2b2cd112f3')
+      .set('authorization', `Bearer ${superUserInfo.token}`);
 
     const { data } = body;
 
@@ -166,6 +236,7 @@ describe('Test disciplines\' controllers', () => {
     expect(Array.isArray(body)).toBe(false);
     expect(data).toBe('Discipline not found');
   });
+
   test('It should NOT update an discipline (invalid time range)', async () => {
     const newDisciplineInfo = generateDiscipline();
 
@@ -178,7 +249,11 @@ describe('Test disciplines\' controllers', () => {
       endHourInMinutes: 1,
     };
 
-    const { body, status } = await request.patch(`/disciplines/${newDiscipline._id}`).send(newInfo);
+    const { body, status } = await request
+      .patch(`/disciplines/${newDiscipline._id}`)
+      .send(newInfo)
+      .set('authorization', `Bearer ${superUserInfo.token}`);
+
     await Discipline.findByIdAndDelete(newDiscipline._id);
 
     const { data } = body;
@@ -188,12 +263,16 @@ describe('Test disciplines\' controllers', () => {
     expect(Array.isArray(body)).toBe(false);
     expect(typeof data).toBe('string');
   });
+
   test('It should delete an discipline', async () => {
     const newDisciplineInfo = generateDiscipline();
 
     const newDiscipline = await Discipline.create(newDisciplineInfo);
 
-    const { body, status } = await request.delete(`/disciplines/${newDiscipline._id}`);
+    const { body, status } = await request
+      .delete(`/disciplines/${newDiscipline._id}`)
+      .set('authorization', `Bearer ${superUserInfo.token}`);
+
     const { data } = body;
 
     expect(status).toBe(200);
@@ -202,7 +281,9 @@ describe('Test disciplines\' controllers', () => {
     expect(data).toBe('Deleted successfully');
   });
   test('It should NOT delete an discipline (wrong id)', async () => {
-    const { body, status } = await request.delete('/disciplines/600566dca73e1f2b2cd112f3');
+    const { body, status } = await request
+      .delete('/disciplines/600566dca73e1f2b2cd112f3')
+      .set('authorization', `Bearer ${superUserInfo.token}`);
 
     const { data } = body;
 

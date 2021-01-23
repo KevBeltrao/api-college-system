@@ -1,7 +1,11 @@
-import { Request, Response, NextFunction } from 'express';
+import {
+  Request, Response, NextFunction, RequestHandler,
+} from 'express';
 import jwt from 'jsonwebtoken';
 
-export default async (
+import User from '@models/User';
+
+export default ({ shouldBeAdmin }: { shouldBeAdmin: Boolean }): RequestHandler => async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -29,7 +33,22 @@ export default async (
 
   const decoded = await jwt.verify(token, process.env.SECRET || '');
 
-  res.locals.userId = (decoded as any).id;
+  const userId = (decoded as any).id;
+
+  const user = await User.findById(userId);
+
+  if (!user) return next({ message: 'User not found' });
+
+  if (
+    shouldBeAdmin
+    && user.role !== 'admin'
+  ) {
+    res.locals.status = 401;
+
+    return next({ message: 'Forbidden' });
+  }
+
+  res.locals.userId = userId;
 
   return next();
 };
