@@ -1,5 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
-import { statusEnum } from './utils/statusEnum';
+import statusEnum from './utils/statusEnum';
 
 import SemesterSubschema, { ISemesterSubschema } from './utils/SemesterSubschema';
 
