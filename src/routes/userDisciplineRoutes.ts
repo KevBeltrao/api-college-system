@@ -1,15 +1,16 @@
 import { Router } from 'express';
 
 import userDisciplineController from '@controllers/userDisciplineController';
+import authenticationHandler from '@helpers/authenticationHandler';
 
 const router = Router();
 
 router.route('/')
-  .get(userDisciplineController.list)
-  .post(userDisciplineController.create);
+  .get(authenticationHandler({ shouldBeAdmin: false }), userDisciplineController.list)
+  .post(authenticationHandler({ shouldBeAdmin: true }), userDisciplineController.create);
 router.route('/:id')
-  .get(userDisciplineController.detail)
-  .patch(userDisciplineController.update)
-  .delete(userDisciplineController.delete);
+  .get(authenticationHandler({ shouldBeAdmin: false }), userDisciplineController.detail)
+  .patch(authenticationHandler({ shouldBeAdmin: true }), userDisciplineController.update)
+  .delete(authenticationHandler({ shouldBeAdmin: true }), userDisciplineController.delete);
 
 export default router;

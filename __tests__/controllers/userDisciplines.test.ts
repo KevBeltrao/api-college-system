@@ -1,13 +1,17 @@
 import supertest from 'supertest';
 import { ObjectID } from 'mongodb';
+import faker from 'faker';
+import { generate as generateCPF } from 'cpf';
 
 import app from '../../src/config/app';
-import UserDiscipline from '../../src/models/UserDiscipline';
-import generateRandomNumber from '../../src/utils/generateRandomNumber';
 
+import UserDiscipline from '../../src/models/UserDiscipline';
 import statusEnum from '../../src/models/utils/statusEnum';
 import User from '../../src/models/User';
 import Discipline from '../../src/models/Discipline';
+
+import generateRandomNumber from '../../src/utils/generateRandomNumber';
+import generateRegistration from '../../src/utils/generateRegistration';
 
 const request = supertest(app);
 
@@ -19,9 +23,56 @@ const generateUserDiscipline = () => ({
   },
 });
 
+const generateUser = (isSuperUser: Boolean = false) => ({
+  name: faker.name.findName(),
+  email: faker.internet.email(),
+  password: '123123',
+  cpf: generateCPF(false),
+  year: 2019,
+  unity: 1,
+  course: 'Sistemas de informação',
+  role: isSuperUser ? 'admin' : 'student',
+});
+
+const loginAsSuperUser = async (email: string, password: string) => {
+  const { body } = await request
+    .post('/login')
+    .send({ login: email, password });
+
+  return body.data.token;
+};
+
 describe('Test userDisciplines\' controllers', () => {
+  type SuperUserType = {
+    _id: string;
+    email: string;
+    token: string;
+  }
+  const superUserInfo = {} as SuperUserType;
+
+  beforeAll(async () => {
+    const newSuperUserInfo = {
+      ...generateUser(true),
+      registration: generateRegistration(),
+    };
+
+    const superUser = await User.create(newSuperUserInfo);
+
+    const { _id, email } = superUser;
+
+    const token = await loginAsSuperUser(email, newSuperUserInfo.password);
+
+    superUserInfo.email = email;
+    superUserInfo._id = _id;
+    superUserInfo.token = token;
+  });
+
+  afterAll(async () => User.findByIdAndDelete(superUserInfo._id));
+
   test('It should list userDisciplines', async () => {
-    const { body, status } = await request.get('/user-disciplines');
+    const { body, status } = await request
+      .get('/user-disciplines')
+      .set('authorization', `Bearer ${superUserInfo.token}`);
     const { data } = body;
 
     const [firstUserDiscipline] = data;
@@ -49,7 +100,10 @@ describe('Test userDisciplines\' controllers', () => {
       disciplineId: firstDiscipline._id,
     };
 
-    const { body, status } = await request.post('/user-disciplines').send(newUserDisciplineInfo);
+    const { body, status } = await request
+      .post('/user-disciplines').send(newUserDisciplineInfo)
+      .set('authorization', `Bearer ${superUserInfo.token}`);
+
     const { data } = body;
 
     await UserDiscipline.findByIdAndDelete(data._id);
@@ -74,7 +128,11 @@ describe('Test userDisciplines\' controllers', () => {
       disciplineId: firstDiscipline._id,
     };
 
-    const { body, status } = await request.post('/user-disciplines').send(newUserDisciplineInfo);
+    const { body, status } = await request
+      .post('/user-disciplines')
+      .send(newUserDisciplineInfo)
+      .set('authorization', `Bearer ${superUserInfo.token}`);
+
     const { data } = body;
 
     await UserDiscipline.findByIdAndDelete(data._id);
@@ -95,7 +153,10 @@ describe('Test userDisciplines\' controllers', () => {
 
     const newUserDiscipline = await UserDiscipline.create(newUserDisciplineInfo);
 
-    const { body, status } = await request.get(`/user-disciplines/${newUserDiscipline._id}`);
+    const { body, status } = await request
+      .get(`/user-disciplines/${newUserDiscipline._id}`)
+      .set('authorization', `Bearer ${superUserInfo.token}`);
+
     const { data } = body;
 
     await UserDiscipline.findByIdAndDelete(data._id);
@@ -110,7 +171,9 @@ describe('Test userDisciplines\' controllers', () => {
     expect(data.semester.unity).toBe(newUserDisciplineInfo.semester.unity);
   });
   test('It should NOT detail an userDiscipline (wrong id)', async () => {
-    const { body, status } = await request.get('/user-disciplines/600566dca73e1f2b2cd112f3');
+    const { body, status } = await request
+      .get('/user-disciplines/600566dca73e1f2b2cd112f3')
+      .set('authorization', `Bearer ${superUserInfo.token}`);
     const { data } = body;
 
     expect(status).toBe(404);
@@ -136,7 +199,8 @@ describe('Test userDisciplines\' controllers', () => {
 
     const { body, status } = await request
       .patch(`/user-disciplines/${newUserDiscipline._id}`)
-      .send(newInfo);
+      .send(newInfo)
+      .set('authorization', `Bearer ${superUserInfo.token}`);
 
     const { data } = body;
 
@@ -156,7 +220,10 @@ describe('Test userDisciplines\' controllers', () => {
       finalScore: generateRandomNumber(0, 10),
     };
 
-    const { body, status } = await request.patch('/user-disciplines/600566dca73e1f2b2cd112f3').send(newInfo);
+    const { body, status } = await request
+      .patch('/user-disciplines/600566dca73e1f2b2cd112f3')
+      .send(newInfo)
+      .set('authorization', `Bearer ${superUserInfo.token}`);
 
     const { data } = body;
 
@@ -179,7 +246,10 @@ describe('Test userDisciplines\' controllers', () => {
 
     const newUserDiscipline = await UserDiscipline.create(newUserDisciplineInfo);
 
-    const { body, status } = await request.delete(`/user-disciplines/${newUserDiscipline._id}`);
+    const { body, status } = await request
+      .delete(`/user-disciplines/${newUserDiscipline._id}`)
+      .set('authorization', `Bearer ${superUserInfo.token}`);
+
     const { data } = body;
 
     expect(status).toBe(200);
@@ -188,7 +258,10 @@ describe('Test userDisciplines\' controllers', () => {
     expect(data).toBe('Deleted successfully');
   });
   test('It should NOT delete an userDiscipline (wrong id)', async () => {
-    const { body, status } = await request.delete('/user-disciplines/600566dca73e1f2b2cd112f3');
+    const { body, status } = await request
+      .delete('/user-disciplines/600566dca73e1f2b2cd112f3')
+      .set('authorization', `Bearer ${superUserInfo.token}`);
+
     const { data } = body;
 
     expect(status).toBe(404);

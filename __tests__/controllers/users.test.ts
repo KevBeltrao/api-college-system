@@ -9,7 +9,7 @@ import generateRegistration from '../../src/utils/generateRegistration';
 
 const request = supertest(app);
 
-const generateUser = () => ({
+const generateUser = (isSuperUser: Boolean = false) => ({
   name: faker.name.findName(),
   email: faker.internet.email(),
   password: '123123',
@@ -17,11 +17,48 @@ const generateUser = () => ({
   year: 2019,
   unity: 1,
   course: 'Sistemas de informação',
+  role: isSuperUser ? 'admin' : 'student',
 });
 
+const loginAsSuperUser = async (email: string, password: string) => {
+  const { body } = await request
+    .post('/login')
+    .send({ login: email, password });
+
+  return body.data.token;
+};
+
 describe('Test users\' controllers', () => {
+  type SuperUserType = {
+    _id: string;
+    email: string;
+    token: string;
+  }
+  const superUserInfo = {} as SuperUserType;
+
+  beforeAll(async () => {
+    const newSuperUserInfo = {
+      ...generateUser(true),
+      registration: generateRegistration(),
+    };
+
+    const superUser = await User.create(newSuperUserInfo);
+
+    const { _id, email } = superUser;
+
+    const token = await loginAsSuperUser(email, newSuperUserInfo.password);
+
+    superUserInfo.email = email;
+    superUserInfo._id = _id;
+    superUserInfo.token = token;
+  });
+
+  afterAll(async () => User.findByIdAndDelete(superUserInfo._id));
+
   test('It should list users', async () => {
-    const { body, status } = await request.get('/users');
+    const { body, status } = await request
+      .get('/users')
+      .set('authorization', `Bearer ${superUserInfo.token}`);
     const { data } = body;
 
     const [firstUser] = data;
@@ -36,10 +73,13 @@ describe('Test users\' controllers', () => {
     expect(typeof firstUser.registration).toBe('string');
     expect(typeof firstUser.active).toBe('boolean');
   });
+
   test('It should create an user', async () => {
     const newUserInfo = generateUser();
 
-    const { body, status } = await request.post('/users').send(newUserInfo);
+    const { body, status } = await request.post('/users')
+      .send(newUserInfo)
+      .set('authorization', `Bearer ${superUserInfo.token}`);
     const { data } = body;
 
     await User.findByIdAndDelete(data._id);
@@ -54,23 +94,32 @@ describe('Test users\' controllers', () => {
     expect(typeof data.registration).toBe('string');
     expect(data.active).toBe(false);
   });
+
   test('It should NOT create an user (missing field)', async () => {
     const newUserInfo = generateUser();
 
-    const { body, status } = await request.post('/users').send({
-      ...newUserInfo,
-      name: undefined,
-    });
+    const { body, status } = await request
+      .post('/users')
+      .send({
+        ...newUserInfo,
+        name: undefined,
+      })
+      .set('authorization', `Bearer ${superUserInfo.token}`);
+
     const { data } = body;
 
     expect(data).toBe('Name field is required');
 
     expect(status).toBe(400);
   });
+
   test('It should detail an user', async () => {
     const [userExample] = await User.find();
 
-    const { body, status } = await request.get(`/users/${userExample._id}`);
+    const { body, status } = await request
+      .get(`/users/${userExample._id}`)
+      .set('authorization', `Bearer ${superUserInfo.token}`);
+
     const { data } = body;
 
     expect(status).toBe(200);
@@ -84,8 +133,12 @@ describe('Test users\' controllers', () => {
     expect(typeof data.registration).toBe('string');
     expect(typeof data.active).toBe('boolean');
   });
+
   test('It should NOT detail an user (wrong id)', async () => {
-    const { body, status } = await request.get('/users/600566dca73e1f2b2cd112f3');
+    const { body, status } = await request
+      .get('/users/600566dca73e1f2b2cd112f3')
+      .set('authorization', `Bearer ${superUserInfo.token}`);
+
     const { data } = body;
 
     expect(status).toBe(404);
@@ -93,6 +146,7 @@ describe('Test users\' controllers', () => {
     expect(Array.isArray(body)).toBe(false);
     expect(data).toBe('User not found');
   });
+
   test('It should update an user', async () => {
     const {
       name,
@@ -122,7 +176,11 @@ describe('Test users\' controllers', () => {
       name: faker.name.findName(),
     };
 
-    const { body, status } = await request.patch(`/users/${newUser._id}`).send(newInfo);
+    const { body, status } = await request
+      .patch(`/users/${newUser._id}`)
+      .send(newInfo)
+      .set('authorization', `Bearer ${superUserInfo.token}`);
+
     await User.findByIdAndDelete(newUser._id);
 
     const { data } = body;
@@ -138,6 +196,7 @@ describe('Test users\' controllers', () => {
     expect(typeof data.registration).toBe('string');
     expect(typeof data.active).toBe('boolean');
   });
+
   test('It should NOT update an user (wrong id)', async () => {
     const newInfo = {
       cpf: generateCPF(false),
@@ -145,7 +204,10 @@ describe('Test users\' controllers', () => {
       name: faker.name.findName(),
     };
 
-    const { body, status } = await request.patch('/users/600566dca73e1f2b2cd112f3').send(newInfo);
+    const { body, status } = await request
+      .patch('/users/600566dca73e1f2b2cd112f3')
+      .send(newInfo)
+      .set('authorization', `Bearer ${superUserInfo.token}`);
 
     const { data } = body;
 
@@ -154,6 +216,7 @@ describe('Test users\' controllers', () => {
     expect(Array.isArray(body)).toBe(false);
     expect(data).toBe('User not found');
   });
+
   test('It should NOT update an user (invalid cpf)', async () => {
     const {
       name,
@@ -183,7 +246,10 @@ describe('Test users\' controllers', () => {
       name: faker.name.findName(),
     };
 
-    const { body, status } = await request.patch(`/users/${newUser._id}`).send(newInfo);
+    const { body, status } = await request
+      .patch(`/users/${newUser._id}`)
+      .send(newInfo)
+      .set('authorization', `Bearer ${superUserInfo.token}`);
 
     await User.findByIdAndDelete(newUser._id);
 
@@ -193,6 +259,7 @@ describe('Test users\' controllers', () => {
     expect(typeof body).toBe('object');
     expect(typeof data).toBe('string');
   });
+
   test('It should delete an user', async () => {
     const {
       name,
@@ -216,7 +283,10 @@ describe('Test users\' controllers', () => {
 
     const newUser = await User.create(newUserInfo);
 
-    const { body, status } = await request.delete(`/users/${newUser._id}`);
+    const { body, status } = await request
+      .delete(`/users/${newUser._id}`)
+      .set('authorization', `Bearer ${superUserInfo.token}`);
+
     const { data } = body;
 
     expect(status).toBe(200);
@@ -224,8 +294,11 @@ describe('Test users\' controllers', () => {
     expect(Array.isArray(body)).toBe(false);
     expect(data).toBe('Deleted successfully');
   });
+
   test('It should NOT delete an user (wrong id)', async () => {
-    const { body, status } = await request.delete('/users/600566dca73e1f2b2cd112f3');
+    const { body, status } = await request
+      .delete('/users/600566dca73e1f2b2cd112f3')
+      .set('authorization', `Bearer ${superUserInfo.token}`);
     const { data } = body;
 
     expect(status).toBe(404);

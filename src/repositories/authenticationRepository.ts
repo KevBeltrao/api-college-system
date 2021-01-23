@@ -1,6 +1,6 @@
-import User from '@models/User';
+import User, { IUserSchema } from '@models/User';
 
-export const detailUser = async (info: string): Promise<object> => {
+export const detailUser = async (info: string): Promise<IUserSchema> => {
   const user = await User.findOne({
     $or: [
       { email: info },

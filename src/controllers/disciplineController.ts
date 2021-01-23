@@ -7,7 +7,7 @@ import {
   listDisciplines,
   detailDiscipline,
   deleteDiscipline,
-} from '@repositories/disciplineRepositories';
+} from '@repositories/disciplineRepository';
 
 export default {
   list: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
