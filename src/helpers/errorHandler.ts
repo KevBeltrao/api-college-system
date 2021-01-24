@@ -8,6 +8,8 @@ export default (
   res: Response,
   next: NextFunction,
 ): void => {
+  console.log({ error });
+
   if (
     process.env.NODE_ENV === 'development'
     || process.env.NODE_ENV === 'test'
